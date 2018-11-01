@@ -60,7 +60,7 @@ static int nbp=0;
 static int parsefix(char *filename,float clat,float clon,float slat,float slon)
 {
 	FILE *fd;
-	char line[64];
+	char line[1024];
 
 	fd=fopen(filename,"r");
 	if(fd==NULL) return -1;
@@ -76,11 +76,11 @@ static int parsefix(char *filename,float clat,float clon,float slat,float slon)
 		return -1;
 
 	while(!feof(fd)) {
-		float lat,lon;
 		int n;
+		float lat,lon;
 		char name[6];
 
-		fgets(line,64,fd);
+		fgets(line,1024,fd);
 		if(line[0]=='\n') continue;
 
 		n=sscanf(line,"%f %f %5s\n",&lat,&lon,name);
@@ -90,7 +90,7 @@ static int parsefix(char *filename,float clat,float clon,float slat,float slon)
 
 		if(strspn(name,"ABCDEFGHIJKLMNOPQRSTUVWXYZ")!=5) continue;
 
-		if(nbp!=0) printf(",\n");
+		if(nbp!=0) printf(",");
 		printf("{type: \"fix\",name: \"%s\",lat:%f,lng:%f}",name,lat,lon);
 		nbp++;
 
@@ -101,8 +101,77 @@ static int parsefix(char *filename,float clat,float clon,float slat,float slon)
 
 static int parsenav(char *filename,float clat,float clon,float slat,float slon)
 {
+	FILE *fd;
+	char line[1024];
 
+	fd=fopen(filename,"r");
+	if(fd==NULL) return -1;
 
+	if(fscanf(fd,"%1s\n",line)!=1)
+		return -1;
+	if(strncmp(line,"I",1)!=0)
+		return -1;
+
+	if(fscanf(fd,"%3s *\n",line)!=1)
+		return -1;
+	if(strncmp(line,"810",3)!=0)
+		return -1;
+
+	while(!feof(fd)) {
+		int n;
+		int type,len;
+		float lat,lon;
+		char *name,*ntype;
+
+		fgets(line,1024,fd);
+		strtok(line,"\n");
+		strtok(line,"\r");
+		if(line[0]==0) continue;
+
+		n=sscanf(line,"%1d %f %f %*d %*d %*d %*f %*s %n",&type,&lat,&lon,&len);
+		if(n<3) continue;
+
+		if(testzone(lat,lon,clat,clon,slat,slon)==0) continue;
+
+		name=&(line[len]);
+		len=strlen(name);
+
+		for(n=len-1;name[n]!=' ' && n>0;n--); 
+		if(n==0) continue;
+		ntype=&(name[n+1]);
+		name[n]=0;
+
+		switch(type) {
+		 case 2 :
+			if(nbp!=0) printf(",");
+			printf("{type:\"ndb\",name:\"%s\",lat:%f,lng:%f}",name,lat,lon);
+			break;
+		 case 3 :
+			if(nbp!=0) printf(",");
+			if(strcmp(ntype,"VOR")==0)
+				printf("{type:\"vor\",name:\"%s\",lat:%f,lng:%f}",name,lat,lon);
+			if(strcmp(ntype,"VOR-DME")==0)
+				printf("{type:\"vordme\",name:\"%s\",lat:%f,lng:%f}",name,lat,lon);
+			if(strcmp(ntype,"VORTAC")==0)
+				printf("{type:\"vortac\",name:\"%s\",lat:%f,lng:%f}",name,lat,lon);
+			break;
+		 case 4 :
+		 case 5 :
+			if(nbp!=0) printf(",");
+			printf("{type:\"loc\",name:\"%s\",lat:%f,lng:%f}",name,lat,lon);
+			break;
+		 case 13 :
+			if(strcmp(ntype,"DME")) continue;
+			if(nbp!=0) printf(",");
+			printf("{type:\"dme\",name:\"%s\",lat:%f,lng:%f}",name,lat,lon);
+			break;
+	 	 default :
+			continue;
+		}
+		nbp++;
+
+	}
+	fclose(fd);
 	return 0;
 }
 
