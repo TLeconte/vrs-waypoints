@@ -121,6 +121,8 @@ static int parsenav(char *filename,float clat,float clon,float slat,float slon)
 		int n;
 		int type,len;
 		float lat,lon;
+		int freq;
+		char id[6];
 		char *name,*ntype;
 
 		fgets(line,1024,fd);
@@ -128,7 +130,7 @@ static int parsenav(char *filename,float clat,float clon,float slat,float slon)
 		strtok(line,"\r");
 		if(line[0]==0) continue;
 
-		n=sscanf(line,"%1d %f %f %*d %*d %*d %*f %*s %n",&type,&lat,&lon,&len);
+		n=sscanf(line,"%1d %f %f %*d %d %*d %*f %5s %n",&type,&lat,&lon,&freq,id,&len);
 		if(n<3) continue;
 
 		if(testzone(lat,lon,clat,clon,slat,slon)==0) continue;
@@ -144,26 +146,29 @@ static int parsenav(char *filename,float clat,float clon,float slat,float slon)
 		switch(type) {
 		 case 2 :
 			if(nbp!=0) printf(",");
-			printf("{type:\"ndb\",name:\"%s\",lat:%f,lng:%f}",name,lat,lon);
+			if(strcmp(ntype,"NDB")==0)
+				printf("{type:\"ndb\",name:\"%s %d\\n%s\",lat:%f,lng:%f}",id,freq,name,lat,lon);
+			if(strcmp(ntype,"NDB-DME")==0)
+				printf("{type:\"ndbdme\",name:\"%s %d\\n%s\",lat:%f,lng:%f}",id,freq,name,lat,lon);
 			break;
 		 case 3 :
 			if(nbp!=0) printf(",");
 			if(strcmp(ntype,"VOR")==0)
-				printf("{type:\"vor\",name:\"%s\",lat:%f,lng:%f}",name,lat,lon);
+				printf("{type:\"vor\",name:\"%s %3.2f\\n%s\",lat:%f,lng:%f}",id,(float)freq/100,name,lat,lon);
 			if(strcmp(ntype,"VOR-DME")==0)
-				printf("{type:\"vordme\",name:\"%s\",lat:%f,lng:%f}",name,lat,lon);
+				printf("{type:\"vordme\",name:\"%s %3.2f\\n%s\",lat:%f,lng:%f}",id,(float)freq/100,name,lat,lon);
 			if(strcmp(ntype,"VORTAC")==0)
-				printf("{type:\"vortac\",name:\"%s\",lat:%f,lng:%f}",name,lat,lon);
+				printf("{type:\"vortac\",name:\"%s %3.2f\\n%s\",lat:%f,lng:%f}",id,(float)freq/100,name,lat,lon);
 			break;
 		 case 4 :
 		 case 5 :
 			if(nbp!=0) printf(",");
-			printf("{type:\"loc\",name:\"%s\",lat:%f,lng:%f}",name,lat,lon);
+			printf("{type:\"loc\",name:\"%s %3.2f\\n%s\",lat:%f,lng:%f}",id,(float)freq/100,name,lat,lon);
 			break;
 		 case 13 :
 			if(strcmp(ntype,"DME")) continue;
 			if(nbp!=0) printf(",");
-			printf("{type:\"dme\",name:\"%s\",lat:%f,lng:%f}",name,lat,lon);
+			printf("{type:\"dme\",name:\"%s %3.2f\\n%s\",lat:%f,lng:%f}",id,(float)freq/100,name,lat,lon);
 			break;
 	 	 default :
 			continue;
