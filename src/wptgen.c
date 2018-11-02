@@ -90,8 +90,8 @@ static int parsefix(char *filename,float clat,float clon,float slat,float slon)
 
 		if(strspn(name,"ABCDEFGHIJKLMNOPQRSTUVWXYZ")!=5) continue;
 
-		if(nbp!=0) printf(",");
-		printf("{type: \"fix\",name: \"%s\",lat:%f,lng:%f}",name,lat,lon);
+		if(nbp!=0) printf(",\n");
+		printf("{type:\"fix\",id:\"%s\",info:\"%s\",lat:%f,lng:%f}",name,name,lat,lon);
 		nbp++;
 
 	}
@@ -145,30 +145,38 @@ static int parsenav(char *filename,float clat,float clon,float slat,float slon)
 
 		switch(type) {
 		 case 2 :
-			if(nbp!=0) printf(",");
-			if(strcmp(ntype,"NDB")==0)
-				printf("{type:\"ndb\",name:\"%s %d\\n%s\",lat:%f,lng:%f}",id,freq,name,lat,lon);
-			if(strcmp(ntype,"NDB-DME")==0)
-				printf("{type:\"ndbdme\",name:\"%s %d\\n%s\",lat:%f,lng:%f}",id,freq,name,lat,lon);
+			if(strcmp(ntype,"NDB")==0) {
+				if(nbp!=0) printf(",\n");
+				printf("{type:\"ndb\",id:\"%s\",info:\"%s %d\\n%s\",lat:%f,lng:%f}",id,id,freq,name,lat,lon);
+			}
+			if(strcmp(ntype,"NDB-DME")==0) {
+				if(nbp!=0) printf(",\n");
+				printf("{type:\"ndbdme\",id:\"%s\",info:\"%s %d\\n%s\",lat:%f,lng:%f}",id,id,freq,name,lat,lon);
+			}
 			break;
 		 case 3 :
-			if(nbp!=0) printf(",");
-			if(strcmp(ntype,"VOR")==0)
-				printf("{type:\"vor\",name:\"%s %3.2f\\n%s\",lat:%f,lng:%f}",id,(float)freq/100,name,lat,lon);
-			if(strcmp(ntype,"VOR-DME")==0)
-				printf("{type:\"vordme\",name:\"%s %3.2f\\n%s\",lat:%f,lng:%f}",id,(float)freq/100,name,lat,lon);
-			if(strcmp(ntype,"VORTAC")==0)
-				printf("{type:\"vortac\",name:\"%s %3.2f\\n%s\",lat:%f,lng:%f}",id,(float)freq/100,name,lat,lon);
+			if(strcmp(ntype,"VOR")==0) {
+				if(nbp!=0) printf(",\n");
+				printf("{type:\"vor\",id:\"%s\",info:\"%s %3.2f\\n%s\",lat:%f,lng:%f}",id,id,(float)freq/100,name,lat,lon);
+			}
+			if(strcmp(ntype,"VOR-DME")==0) {
+				if(nbp!=0) printf(",\n");
+				printf("{type:\"vordme\",id:\"%s\",info:\"%s %3.2f\\n%s\",lat:%f,lng:%f}",id,id,(float)freq/100,name,lat,lon);
+			}
+			if(strcmp(ntype,"VORTAC")==0) {
+				if(nbp!=0) printf(",\n");
+				printf("{type:\"vortac\",id:\"%s\",info:\"%s %3.2f\\n%s\",lat:%f,lng:%f}",id,id,(float)freq/100,name,lat,lon);
+			}
 			break;
 		 case 4 :
 		 case 5 :
-			if(nbp!=0) printf(",");
-			printf("{type:\"loc\",name:\"%s %3.2f\\n%s\",lat:%f,lng:%f}",id,(float)freq/100,name,lat,lon);
+			if(nbp!=0) printf(",\n");
+			printf("{type:\"loc\",id:\"%s\",info:\"%s %3.2f\\n%s\",lat:%f,lng:%f}",id,id,(float)freq/100,name,lat,lon);
 			break;
 		 case 13 :
 			if(strcmp(ntype,"DME")) continue;
-			if(nbp!=0) printf(",");
-			printf("{type:\"dme\",name:\"%s %3.2f\\n%s\",lat:%f,lng:%f}",id,(float)freq/100,name,lat,lon);
+			if(nbp!=0) printf(",\n");
+			printf("{type:\"dme\",id:\"%s\",info:\"%s %3.2f\\n%s\",lat:%f,lng:%f}",id,id,(float)freq/100,name,lat,lon);
 			break;
 	 	 default :
 			continue;
