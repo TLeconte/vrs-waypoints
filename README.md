@@ -15,4 +15,4 @@ Support for waypoints and navaids in Virtual Radar Server.
 ## Notes
  * Use wptgen -h to get the options. You have to give the center position you want to cover to limit the size of the generated waypoints.html file.
  * wptgen use fix.dat and nav.dat database file. They are under GPL and was originaly maintened by the X-plane community. X-plane 11 don't use them anymore, but FlightGear continue to use them.
- * The fix.dat and nav.dat included here comme from !(https://sourceforge.net/p/flightgear/navdata/ci/master/tree/)
+ * The fix.dat and nav.dat included here comme from https://sourceforge.net/p/flightgear/navdata/ci/master/tree/Navaids/
