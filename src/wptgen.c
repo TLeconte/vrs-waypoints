@@ -65,12 +65,9 @@ static int parsefix(char *filename,float clat,float clon,float slat,float slon)
 	fd=fopen(filename,"r");
 	if(fd==NULL) return -1;
 
-	if(fscanf(fd,"%1s\n",line)!=1)
-		return -1;
-	if(strncmp(line,"I",1)!=0)
-		return -1;
+	fgets(line,1024,fd);
 
-	if(fscanf(fd,"%3s *\n",line)!=1)
+	if(fscanf(fd,"%3s\n",line)!=1)
 		return -1;
 	if(strncmp(line,"600",3)!=0)
 		return -1;
@@ -107,12 +104,9 @@ static int parsenav(char *filename,float clat,float clon,float slat,float slon)
 	fd=fopen(filename,"r");
 	if(fd==NULL) return -1;
 
-	if(fscanf(fd,"%1s\n",line)!=1)
-		return -1;
-	if(strncmp(line,"I",1)!=0)
-		return -1;
+	fgets(line,1024,fd);
 
-	if(fscanf(fd,"%3s *\n",line)!=1)
+	if(fscanf(fd,"%3s",line)!=1)
 		return -1;
 	if(strncmp(line,"810",3)!=0)
 		return -1;
