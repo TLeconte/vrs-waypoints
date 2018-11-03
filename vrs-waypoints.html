@@ -9,7 +9,7 @@
 
                 if (showWaypoints) {
                     for (var i = 0; i < waypoints.length; i++) {
-                        marker = _Map.addMarker(waypoints[i].type + "-" + waypoints[i].id, {
+                        wptoption = {
                             clickable: true,
                             draggable: false,
                             editable: false,
@@ -22,7 +22,15 @@
                                 lat: waypoints[i].lat,
                                 lng: waypoints[i].lng
                             }
-                        });
+                        }
+			if(waypoints[i].type == "ndb" || waypoints[i].type == "ndbdme" ) {
+				wptoption.icon.size={ width:44,heigth:44};
+				wptoption.icon.anchor={ x:22,y:22};
+			} else {
+				wptoption.icon.size={ width:24,heigth:24};
+				wptoption.icon.anchor={ x:12,y:12};
+			}
+                        marker = _Map.addMarker(waypoints[i].type + "-" + waypoints[i].id, wptoption);
                     }
 
                     console.log("Loaded " + waypoints.length + " waypoint(s)");
