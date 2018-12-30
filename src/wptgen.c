@@ -30,8 +30,8 @@ static void usage(void)
 	printf ("by default slat and slon = 2.0. Don't use too large value if you don't want a too big output file\n");
 	printf ("lat,lon,sizelat,sizelon in decimal degree, negativ for West and South\n");
 	printf("Options :\n");
-	printf("\t-f fixfile : path of fix.dat file (default : fix.dat)\n");
-	printf("\t-n navfile : path of nav.dat file (default : nav.dat)\n");
+	printf("\t-f fixfile : path of fix.dat file\n");
+	printf("\t-n navfile : path of nav.dat file\n");
 	printf("Example :\n");
 	printf("wptgen -f data/fix.dat -n data/nav.dat -- 46.53 2.40\n\n");
 
@@ -186,8 +186,8 @@ static int parsenav(char *filename,float clat,float clon,float slat,float slon)
 int main(int argc, char **argv)
 {
 	int c;
-	char *fixfilename="fix.dat";
-	char *navfilename="nat.dat";
+	char *fixfilename=NULL;
+	char *navfilename=NULL;
 	float clat,clon;
 	float slat=2,slon=2;
 
@@ -219,10 +219,10 @@ int main(int argc, char **argv)
 	}
 
 	outheader(clat,clon,slat,slon);
-	if(parsefix(fixfilename,clat,clon,slat,slon)) {
+	if(fixfilename && parsefix(fixfilename,clat,clon,slat,slon)) {
 		exit(1);
 	}
-	if(parsenav(navfilename,clat,clon,slat,slon)) {
+	if(navfilename && parsenav(navfilename,clat,clon,slat,slon)) {
 		exit(1);
 	}
 	outfooter();
